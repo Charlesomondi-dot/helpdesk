@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}My Tickets - STJTID IT Helpdesk{% endblock %}
+
+{% block content %}
+<div class="tickets-container">
+    <div class="tickets-header">
+        <h1>My Support Tickets</h1>
+        <a href="{{ url_for('submit_ticket') }}" class="btn btn-primary">+ New Ticket</a>
+    </div>
+
+    {% if tickets.items %}
+        <div class="tickets-list">
+            {% for ticket in tickets.items %}
+                <div class="ticket-item">
+                    <div class="ticket-header">
+                        <h3><a href="{{ url_for('view_ticket', ticket_id=ticket.id) }}">#{{ ticket.id }} - {{ ticket.subject }}</a></h3>
+                        <span class="status status-{{ ticket.status }}">{{ ticket.status.upper() }}</span>
+                    </div>
+                    <div class="ticket-meta">
+                        <span class="category">{{ ticket.category }}</span>
+                        <span class="priority priority-{{ ticket.priority }}">{{ ticket.priority.upper() }}</span>
+                        <span class="date">{{ ticket.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    </div>
+                    <p class="ticket-description">{{ ticket.description[:150] }}...</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="pagination">
+            {% if tickets.has_prev %}
+                <a href="{{ url_for('my_tickets', page=tickets.prev_num) }}" class="btn btn-secondary">← Previous</a>
+            {% endif %}
+            
+            <span>Page {{ tickets.page }} of {{ tickets.pages }}</span>
+            
+            {% if tickets.has_next %}
+                <a href="{{ url_for('my_tickets', page=tickets.next_num) }}" class="btn btn-secondary">Next →</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>You haven't submitted any tickets yet.</p>
+            <a href="{{ url_for('submit_ticket') }}" class="btn btn-primary">Submit Your First Ticket</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

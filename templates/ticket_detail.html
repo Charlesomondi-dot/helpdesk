@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Ticket #{{ ticket.id }} - STJTID IT Helpdesk{% endblock %}
+
+{% block content %}
+<div class="ticket-detail-container">
+    <div class="ticket-detail-header">
+        <h1>Ticket #{{ ticket.id }}</h1>
+        <div class="ticket-status">
+            <span class="status status-{{ ticket.status }}">{{ ticket.status.upper() }}</span>
+            <span class="priority priority-{{ ticket.priority }}">{{ ticket.priority.upper() }}</span>
+        </div>
+    </div>
+
+    <div class="ticket-info">
+        <h2>{{ ticket.subject }}</h2>
+        <div class="ticket-meta">
+            <p><strong>Category:</strong> {{ ticket.category }}</p>
+            <p><strong>Assigned To:</strong> {{ ticket.assigned_staff.username if ticket.assigned_staff else 'Unassigned' }}</p>
+            <p><strong>Created:</strong> {{ ticket.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+            {% if ticket.resolved_at %}
+                <p><strong>Resolved:</strong> {{ ticket.resolved_at.strftime('%Y-%m-%d %H:%M') }}</p>
+            {% endif %}
+        </div>
+
+        <div class="ticket-description-box">
+            <h3>Your Issue</h3>
+            <p>{{ ticket.description }}</p>
+        </div>
+
+        {% if ticket.response %}
+            <div class="ticket-response-box">
+                <h3>IT Response</h3>
+                <p>{{ ticket.response }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if session.get('is_staff') %}
+    <div class="admin-control-panel">
+        <h3>Admin Controls</h3>
+        <form method="post" action="{{ url_for('admin_update_ticket', ticket_id=ticket.id) }}" class="admin-edit-form">
+            <div class="control-grid">
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" name="subject" value="{{ ticket.subject }}">
+                </div>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <input type="text" id="category" name="category" value="{{ ticket.category }}">
+                </div>
+                <div class="form-group">
+                    <label for="priority">Priority</label>
+                    <select id="priority" name="priority">
+                        <option value="low" {% if ticket.priority == 'low' %}selected{% endif %}>Low</option>
+                        <option value="normal" {% if ticket.priority == 'normal' %}selected{% endif %}>Normal</option>
+                        <option value="high" {% if ticket.priority == 'high' %}selected{% endif %}>High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status">
+                        <option value="open" {% if ticket.status == 'open' %}selected{% endif %}>Open</option>
+                        <option value="in_progress" {% if ticket.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                        <option value="resolved" {% if ticket.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="assigned_staff_id">Assign Staff</label>
+                    <select id="assigned_staff_id" name="assigned_staff_id">
+                        <option value="">Unassigned</option>
+                        {% for staff in staff_users %}
+                            <option value="{{ staff.id }}" {% if ticket.assigned_staff_id == staff.id %}selected{% endif %}>{{ staff.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="6">{{ ticket.description }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="response">IT Response</label>
+                <textarea id="response" name="response" rows="4">{{ ticket.response or '' }}</textarea>
+            </div>
+            <div class="control-actions">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+        <form method="post" action="{{ url_for('admin_delete_ticket', ticket_id=ticket.id) }}" onsubmit="return confirm('Delete this ticket and its message history?');">
+            <button type="submit" class="btn btn-danger">Delete Ticket</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="messages-section">
+        <h3>Conversation</h3>
+        
+        <div class="messages-list">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="message">
+                        <div class="message-header">
+                            <strong>{{ message.sender.username }}</strong>
+                            <span class="message-date">{{ message.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                        </div>
+                        <div class="message-content">
+                            {{ message.content }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No messages yet.</p>
+            {% endif %}
+        </div>
+
+        {% if ticket.status != 'resolved' %}
+            <div class="message-form">
+                <form id="messageForm">
+                    <textarea id="messageContent" placeholder="Add a message..." rows="4"></textarea>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </form>
+                <div id="messageError" class="error-message"></div>
+            </div>
+        {% endif %}
+    </div>
+
+    <a href="{{ url_for('my_tickets') }}" class="btn btn-secondary">← Back to My Tickets</a>
+</div>
+
+<script>
+document.getElementById('messageForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const content = document.getElementById('messageContent').value;
+    const errorDiv = document.getElementById('messageError');
+
+    try {
+        const response = await fetch('{{ url_for("add_message", ticket_id=ticket.id) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content })
+        });
+
+        if (response.ok) {
+            location.reload();
+        } else {
+            errorDiv.textContent = 'Failed to send message';
+        }
+    } catch (error) {
+        errorDiv.textContent = 'An error occurred';
+    }
+});
+</script>
+{% endblock %}

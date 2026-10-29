@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}STJTID Institute Helpdesk{% endblock %}</title>
+    <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='img/logo stjttid.jpg') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">
+                <a class="brand-link" href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='img/logo stjttid.jpg') }}" alt="STJTID Institute logo" class="brand-logo">
+                    <span>
+                        <strong>STJTID Institute</strong>
+                        <small>IT Helpdesk</small>
+                    </span>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                {% if session.get('user_id') %}
+                    {% if session.get('is_staff') %}
+                        <li><a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('my_tickets') }}">My Tickets</a></li>
+                        <li><a href="{{ url_for('submit_ticket') }}">Submit Ticket</a></li>
+                    {% endif %}
+                    <li><a href="{{ url_for('logout') }}" class="logout-btn">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Sign In</a></li>
+                    <li><a href="{{ url_for('register') }}" class="btn-primary">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    {% if session.get('message') %}
+        <div class="alert alert-success">{{ session.pop('message') }}</div>
+    {% endif %}
+
+    {% if session.get('error') %}
+        <div class="alert alert-error">{{ session.pop('error') }}</div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2026 STJTID Institute. All rights reserved.</p>
+            <p>Education for Self Reliance.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Ticket - STJTID IT Helpdesk{% endblock %}
+
+{% block content %}
+<div class="ticket-container">
+    <h1>Submit a Support Ticket</h1>
+    
+    <form id="ticketForm" class="ticket-form">
+        <div class="form-group">
+            <label for="subject">Subject *</label>
+            <input type="text" id="subject" name="subject" required placeholder="Brief description of your issue">
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category *</label>
+            <select id="category" name="category" required>
+                <option value="">Select a category</option>
+                <option value="accounts">Accounts & Passwords</option>
+                <option value="hardware">Hardware & Devices</option>
+                <option value="network">Network & Wi-Fi</option>
+                <option value="learning">Learning Systems</option>
+                <option value="printing">Printing & Scanning</option>
+                <option value="software">Software Support</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="module">ERP Module (if applicable)</label>
+            <select id="module" name="module">
+                <option value="">None / Not an ERP issue</option>
+                <option value="finance">Finance</option>
+                <option value="human_resources">Human Resources</option>
+                <option value="inventory">Inventory</option>
+                <option value="payroll">Payroll</option>
+                <option value="procurement">Procurement</option>
+                <option value="admissions">Admissions</option>
+                <option value="student_records">Student Records</option>
+                <option value="examinations">Examinations</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="priority">Priority</label>
+            <select id="priority" name="priority">
+                <option value="low">Low - Not urgent</option>
+                <option value="normal" selected>Normal - Standard</option>
+                <option value="high">High - Urgent</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description *</label>
+            <textarea id="description" name="description" rows="8" required 
+                      placeholder="Please provide detailed information about your issue..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Ticket</button>
+        <div id="error" class="error-message"></div>
+        <div id="success" class="success-message"></div>
+    </form>
+</div>
+
+<script>
+document.getElementById('ticketForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const subject = document.getElementById('subject').value;
+    const description = document.getElementById('description').value;
+    const category = document.getElementById('category').value;
+    const priority = document.getElementById('priority').value;
+    const errorDiv = document.getElementById('error');
+    const successDiv = document.getElementById('success');
+
+    try {
+        const response = await fetch('{{ url_for("submit_ticket") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ subject, description, category, priority, module: document.getElementById('module').value })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            successDiv.textContent = 'Ticket submitted successfully! Redirecting to your tickets...';
+            setTimeout(() => {
+                window.location.href = '{{ url_for("my_tickets") }}';
+            }, 2000);
+        } else {
+            errorDiv.textContent = data.error || 'Failed to submit ticket';
+        }
+    } catch (error) {
+        errorDiv.textContent = 'An error occurred. Please try again.';
+    }
+});
+</script>
+{% endblock %}

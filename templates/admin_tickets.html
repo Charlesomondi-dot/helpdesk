@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Tickets - STJTID IT Helpdesk{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <h2>Manage Tickets</h2>
+
+    <div class="filter-tabs">
+        <a href="{{ url_for('admin_tickets', status='open') }}" class="tab {% if status == 'open' %}active{% endif %}">
+            Open ({{ tickets.total }})
+        </a>
+        <a href="{{ url_for('admin_tickets', status='in_progress') }}" class="tab {% if status == 'in_progress' %}active{% endif %}">
+            In Progress
+        </a>
+        <a href="{{ url_for('admin_tickets', status='resolved') }}" class="tab {% if status == 'resolved' %}active{% endif %}">
+            Resolved
+        </a>
+    </div>
+
+    {% if tickets.items %}
+        <div class="tickets-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ticket ID</th>
+                        <th>Subject</th>
+                        <th>User</th>
+                        <th>Category</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Created</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets.items %}
+                        <tr>
+                            <td>#{{ ticket.id }}</td>
+                            <td>{{ ticket.subject[:40] }}</td>
+                            <td>{{ ticket.user.username }}</td>
+                            <td>{{ ticket.category }}</td>
+                            <td>{{ ticket.assigned_staff.username if ticket.assigned_staff else 'Unassigned' }}</td>
+                            <td><span class="status status-{{ ticket.status }}">{{ ticket.status }}</span></td>
+                            <td><span class="priority priority-{{ ticket.priority }}">{{ ticket.priority }}</span></td>
+                            <td>{{ ticket.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td><a href="{{ url_for('view_ticket', ticket_id=ticket.id) }}" class="btn btn-small">View / Edit</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            {% if tickets.has_prev %}
+                <a href="{{ url_for('admin_tickets', status=status, page=tickets.prev_num) }}" class="btn btn-secondary">← Previous</a>
+            {% endif %}
+            
+            <span>Page {{ tickets.page }} of {{ tickets.pages }}</span>
+            
+            {% if tickets.has_next %}
+                <a href="{{ url_for('admin_tickets', status=status, page=tickets.next_num) }}" class="btn btn-secondary">Next →</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No {{ status }} tickets found.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero">
+    <div class="hero-content">
+        <img src="{{ url_for('static', filename='img/logo stjttid.jpg') }}" alt="STJTID Institute logo" class="hero-logo">
+        <h1>STJTID Institute IT Helpdesk</h1>
+        <p>Fast, reliable IT support for students and staff. Sign in to your account to submit and track your service requests.</p>
+        <div class="hero-buttons">
+            {% if session.get('user_id') %}
+                {% if session.get('is_staff') %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary">Admin Dashboard</a>
+                {% else %}
+                    <a href="{{ url_for('submit_ticket') }}" class="btn btn-primary">Submit a Ticket</a>
+                    <a href="{{ url_for('my_tickets') }}" class="btn btn-secondary">Track a Ticket</a>
+                {% endif %}
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-primary">Sign In / My Account</a>
+                <a href="{{ url_for('register') }}" class="btn btn-secondary">Create Account</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<section class="services">
+    <h2>How can we help?</h2>
+    <p class="subtitle">We provide support across a wide range of campus services and technologies.</p>
+    
+    <div class="services-grid">
+        <div class="service-card">
+            <div class="service-icon">🔐</div>
+            <h3>Accounts & Passwords</h3>
+            <p>Password resets, access issues</p>
+        </div>
+        <div class="service-card">
+            <div class="service-icon">💻</div>
+            <h3>Hardware & Devices</h3>
+            <p>Computer, projector, phone issues</p>
+        </div>
+        <div class="service-card">
+            <div class="service-icon">📡</div>
+            <h3>Network & Wi-Fi</h3>
+            <p>Connectivity, VPN, internet access</p>
+        </div>
+        <div class="service-card">
+            <div class="service-icon">📚</div>
+            <h3>Learning Systems</h3>
+            <p>LMS, student portal support</p>
+        </div>
+        <div class="service-card">
+            <div class="service-icon">🖨️</div>
+            <h3>Printing & Scanning</h3>
+            <p>Campus printers, copiers</p>
+        </div>
+        <div class="service-card">
+            <div class="service-icon">⚙️</div>
+            <h3>Software Support</h3>
+            <p>Microsoft 365, specialized apps</p>
+        </div>
+    </div>
+</section>
+
+<section class="how-it-works">
+    <h2>How it works</h2>
+    <p class="subtitle">A simple, transparent process to get your issues resolved.</p>
+    
+    <div class="steps">
+        <div class="step">
+            <div class="step-number">1</div>
+            <h3>Submit Request</h3>
+            <p>Sign in and describe your issue with as much detail as possible.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <h3>IT Reviews</h3>
+            <p>Our staff will assess your ticket, prioritize it, and begin working on a fix.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <h3>Resolved</h3>
+            <p>We resolve the issue and notify you. You can track status anytime.</p>
+        </div>
+    </div>
+</section>
+
+<section class="info-section">
+    <div class="info-box">
+        <h3>⏱️ Timely Resolution</h3>
+        <p>We aim to respond to all standard requests within 4 hours during normal campus operating hours.</p>
+    </div>
+    <div class="info-box">
+        <h3>🤝 Dedicated Support</h3>
+        <p>Our team is committed to keeping the STJTID community connected and productive.</p>
+    </div>
+</section>
+{% endblock %}

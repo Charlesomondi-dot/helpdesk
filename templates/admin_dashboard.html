@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - STJTID IT Helpdesk{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <h1>Admin Dashboard</h1>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Open Tickets</h3>
+            <p class="stat-number">{{ open_tickets }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Resolved Tickets</h3>
+            <p class="stat-number">{{ resolved_tickets }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Total Users</h3>
+            <p class="stat-number">{{ total_users }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Total Tickets</h3>
+            <p class="stat-number">{{ open_tickets + resolved_tickets }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Assigned Tickets</h3>
+            <p class="stat-number">{{ assigned_tickets }}</p>
+        </div>
+    </div>
+
+    <div class="admin-nav">
+        <a href="{{ url_for('admin_tickets') }}" class="btn btn-secondary">Manage Tickets</a>
+        <a href="{{ url_for('admin_users') }}" class="btn btn-secondary">Manage Users</a>
+        <a href="{{ url_for('download_ticket_report', report_format='csv') }}" class="btn btn-primary">Download CSV</a>
+        <a href="{{ url_for('download_ticket_report', report_format='json') }}" class="btn btn-primary">Download JSON</a>
+        <a href="{{ url_for('download_ticket_report', report_format='txt') }}" class="btn btn-primary">Download TXT</a>
+    </div>
+
+    <div class="record-note">
+        <strong>Record keeping:</strong> assignments, modifications, password resets, deletions, and multi-format report exports are part of the admin workflow so the helpdesk can maintain proper records.
+    </div>
+
+    <h2>Recent Tickets</h2>
+    {% if recent_tickets %}
+        <div class="tickets-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ticket ID</th>
+                        <th>Subject</th>
+                        <th>User</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Created</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in recent_tickets %}
+                        <tr>
+                            <td>#{{ ticket.id }}</td>
+                            <td>{{ ticket.subject[:40] }}</td>
+                            <td>{{ ticket.user.username }}</td>
+                            <td>{{ ticket.assigned_staff.username if ticket.assigned_staff else 'Unassigned' }}</td>
+                            <td><span class="status status-{{ ticket.status }}">{{ ticket.status }}</span></td>
+                            <td><span class="priority priority-{{ ticket.priority }}">{{ ticket.priority }}</span></td>
+                            <td>{{ ticket.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td><a href="{{ url_for('view_ticket', ticket_id=ticket.id) }}" class="btn btn-small">View</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
