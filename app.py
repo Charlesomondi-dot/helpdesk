@@ -10,15 +10,15 @@ import secrets
 from functools import wraps
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key-change-this'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') or secrets.token_hex(32)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///helpdesk.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
 DEFAULT_ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'admin')
-DEFAULT_ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@stjtid.edu')
-DEFAULT_ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'Admin@12345')
+DEFAULT_ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@example.com')
+DEFAULT_ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
 
 # Role definitions
 ROLE_CHOICES = [
@@ -555,6 +555,11 @@ def ensure_default_admin():
         if changed:
             db.session.commit()
         return
+
+    if not DEFAULT_ADMIN_PASSWORD:
+        raise RuntimeError(
+            'ADMIN_PASSWORD must be set before the default admin account can be created.'
+        )
 
     admin_user = User(
         username=DEFAULT_ADMIN_USERNAME,

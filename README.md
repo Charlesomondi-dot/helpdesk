@@ -40,12 +40,10 @@ The database file `helpdesk.db` will be created automatically.
 
 The app creates a default system admin account automatically on startup.
 
-**Default admin credentials:**
-- Username: `admin`
-- Email: `admin@stjtid.edu`
-- Password: `Admin@12345`
+Configure the admin account with environment variables before starting the app.
+See [.env.example](.env.example) for the available settings. Never commit your
+local `.env` file or real credentials.
 
-You can change these by setting environment variables before starting the app:
 - `ADMIN_USERNAME`
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
@@ -139,7 +137,7 @@ IT HELPDESK/
 ## Security Notes
 
 ⚠️ **Important for Production:**
-- Change the `SECRET_KEY` in `app.py` to a random string
+- Set `SECRET_KEY` to a long random string
 - Use environment variables for sensitive configuration
 - Set `debug=False` when running in production
 - Use HTTPS instead of HTTP

@@ -42,10 +42,10 @@ Your IT Helpdesk system is ready to use!
 The app now creates a default system admin automatically.
 
 **Login details:**
-- Username: `admin`
-- Password: `Admin@12345`
+- Set `ADMIN_USERNAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` before the first
+  startup. Use [.env.example](.env.example) as a template.
 
-If you want custom credentials, set these environment variables before starting the app:
+Set these environment variables before starting the app:
 - `ADMIN_USERNAME`
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
@@ -148,12 +148,12 @@ IT HELPDESK/
 
 Change:
 ```python
-app.config['SECRET_KEY'] = 'your-secret-key-change-this'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') or secrets.token_hex(32)
 ```
 
 To something random like:
 ```python
-app.config['SECRET_KEY'] = 'aB3dE7fG9hJ2kL5mN8pQ1rS4tU6vW9xY2'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') or secrets.token_hex(32)
 ```
 
 ---
@@ -176,11 +176,11 @@ Delete `helpdesk.db` and restart the server to recreate it.
 
 ---
 
-## 📧 Default Account Info
+## 📧 Admin Account Info
 
-**Admin Username**: `admin`
-**Admin Email**: `admin@stjtid.edu`
-**Admin Password**: `AdminPassword123` (change this!)
+Set `ADMIN_USERNAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` before the first
+startup. Keep the real values in your local `.env` file and use
+[.env.example](.env.example) as the safe template.
 
 ---
 
